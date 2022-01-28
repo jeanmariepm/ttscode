@@ -6,6 +6,7 @@ from slcsp import slcsp
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
+os.makedirs(TMP_DIR, exist_ok=True)
 
 
 def test_csv_to_df():
