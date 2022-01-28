@@ -1,6 +1,6 @@
 # Sample Code Assignment
 
-## Requirements
+## Problem Statement
 See ./data/README.md
 
 ## Installation
@@ -13,7 +13,7 @@ See ./data/README.md
 My development of the program was first done in Jupyter. The included notebook **slcsp.ipynb** is useful to debug the solution, especially when reviewing specific cases.
 
 ## Test
-`pytest test.py`
+`pytest`
 
 ## Run program
 `python slcsp.py -s data/slcsp.csv -p data/plans.csv 
