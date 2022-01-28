@@ -1,9 +1,19 @@
 import csv
-import slcsp
+import os
+from pathlib import Path
+
+from slcsp import slcsp
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 
 
 def test_csv_to_df():
-    test_file = "_test_.csv"
+    '''
+    Ensure file can be read into a pandas df
+    '''
+
+    test_file = f"{TMP_DIR}/_test_.csv"
     row_count = 10
     with open(test_file, "w") as file:
         writer = csv.writer(file)
