@@ -1,8 +1,7 @@
-import argparse
-import csv
-import pandas as pd
-from os.path import exists
 import sys
+from os.path import exists
+import argparse
+import pandas as pd
 
 
 def get_filenames():
@@ -17,7 +16,9 @@ def get_filenames():
                         help='csv file with all the health plans in the U.S. on the marketplace',
                         required=True)
     parser.add_argument('-z', '--zips',
-                        help='csv file with a mapping of ZIP Code to county/counties & rate area(s)',
+                        help='''
+                        csv file with a mapping of ZIP Code to county/counties & rate area(s)
+                        ''',
                         required=True)
     parser.add_argument('-s', '--slcsp',
                         help='csv file wit the ZIP codes that need to be processed',
@@ -49,7 +50,7 @@ def get_ref_plans(plans: pd.DataFrame):
     Select only the silver plans.
     Rank them in ascending rate for each state and area
     Pick the second lowest from the ranked plans
-    Pick the only plan if there is no second-ranked plan
+    Pick the only (lowest) plan if there is no second-ranked plan
     Merge the picked plans
 
     Params:
@@ -65,8 +66,10 @@ def get_ref_plans(plans: pd.DataFrame):
         .groupby(['state', 'rate_area'])
         .cumcount() + 1
     ).sort_values(['state', 'rate_area', "rn"])
+
     second_lowest = ranked_selver_plans[
         ranked_selver_plans['rn'] == 2]
+
     # lowest = ranked_silver minus plans with many rates
     many_rates_condition = ranked_selver_plans[['state', 'rate_area']].isin(
         second_lowest[['state', 'rate_area']])
@@ -102,14 +105,16 @@ if __name__ == "__main__":
 
     try:
         ref_plans = get_ref_plans(plans)
-    except:
+    except KeyError as err:
+        print(err, file=sys.stderr)
         print('Invalid plan file. Must be a csv file with state, rate_area and rate')
         sys.exit(1)
     # print(ref_plans)
 
     try:
         zip_plans = get_zip_plans(zips, ref_plans)
-    except:
+    except KeyError as err:
+        print(err, file=sys.stderr)
         print('Invalid zips file. Must be a csv file with zipcode, state, rate_area')
         sys.exit(1)
     # print(zip_plans)
