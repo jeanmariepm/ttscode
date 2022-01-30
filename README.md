@@ -16,5 +16,5 @@ My development of the program was first done in Jupyter. The included notebook *
 `pytest`
 
 ## Run program
-`python slcsp.py -s data/slcsp.csv -p data/plans.csv 
+`python slcsp/slcsp.py -s data/slcsp.csv -p data/plans.csv 
 -z data/zips.csv`
