@@ -76,9 +76,8 @@ def get_ref_plans(plans: pd.DataFrame):
     lowest = ranked_selver_plans.drop(
         ranked_selver_plans[many_rates_condition].index)
 
-    ref_plans = pd.concat([lowest, second_lowest],
-                          ignore_index=True)
-    return ref_plans
+    return pd.concat([lowest, second_lowest],
+                     ignore_index=True)
 
 
 def get_zip_plans(zips: pd.DataFrame, ref_plans: pd.DataFrame):

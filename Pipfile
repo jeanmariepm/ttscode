@@ -11,6 +11,7 @@ pandas = "*"
 autopep8 = "*"
 pytest = "*"
 pylint = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.8"
