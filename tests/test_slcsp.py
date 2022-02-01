@@ -30,6 +30,20 @@ def load_test_plans():
     return df
 
 
+@pytest.fixture
+def load_test_zips():
+    '''
+    Create a zips df to test scenarios
+    '''
+    df = pd.DataFrame(columns=('zipcode', 'state', 'rate_area'))
+    df.loc[0] = [100001, 'AZ', 1]
+    df.loc[1] = [200001, 'KY', 1]
+    df.loc[2] = [200002, 'KY', 2]
+    df.loc[3] = [200002, 'KY', 2]
+
+    return df
+
+
 def test_csv_to_df():
     '''
     Ensure file can be read into a pandas df
@@ -74,3 +88,21 @@ def test_get_ref_plans_returns_only_for_KY_1(load_test_plans):
     KY_1_FILTER = (ref_plans['state'] == 'KY') & (ref_plans['rate_area'] == 1)
     result = ref_plans.loc[KY_1_FILTER].iloc[0]['rate']
     assert result == 73.1
+
+
+def test_get_zip_plans_for_good_zips(
+        load_test_zips, load_test_plans):
+    ref_plans = slcsp.get_ref_plans(load_test_plans)
+    zip_plans = slcsp.get_zip_plans(load_test_zips, ref_plans)
+    KY_1_FILTER = zip_plans['zipcode'] == 200001
+    result = zip_plans.loc[KY_1_FILTER].iloc[0]['rate']
+    assert result == 73.1
+
+
+def test_get_zip_plans_for_ambiguous_zips(
+        load_test_zips, load_test_plans):
+    ref_plans = slcsp.get_ref_plans(load_test_plans)
+    zip_plans = slcsp.get_zip_plans(load_test_zips, ref_plans)
+    KY_2_FILTER = zip_plans['zipcode'] == 200002
+    result = zip_plans.loc[KY_2_FILTER]
+    assert len(result) == 0
