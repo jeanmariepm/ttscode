@@ -59,25 +59,25 @@ def get_ref_plans(plans: pd.DataFrame):
     Returns:
       ref_plans: Pandas dataframe that has exactly one rate per state and rate area
     """
+    COLS_TO_RETURN = ['state', 'rate_area', 'rate']
     silver_filter = plans['metal_level'] == 'Silver'
     silver_plans = plans[silver_filter]
+    silver_plans = silver_plans[COLS_TO_RETURN]
     ranked_selver_plans = silver_plans.assign(
         rn=silver_plans.sort_values(["rate"])
         .groupby(['state', 'rate_area'])
         .cumcount() + 1
     ).sort_values(['state', 'rate_area', "rn"])
-
     second_lowest = ranked_selver_plans[
         ranked_selver_plans['rn'] == 2]
 
     # lowest = ranked_silver minus plans with many rates
-    many_rates_condition = ranked_selver_plans[['state', 'rate_area']].isin(
-        second_lowest[['state', 'rate_area']])
-    lowest = ranked_selver_plans.drop(
-        ranked_selver_plans[many_rates_condition].index)
-
+    tmp = pd.merge(ranked_selver_plans, second_lowest, indicator=True,
+                   on=['state', 'rate_area'], how='outer',
+                   suffixes=[None, '_y'])
+    lowest = tmp[tmp['_merge'] == 'left_only']
     return pd.concat([lowest, second_lowest],
-                     ignore_index=True)
+                     ignore_index=True)[COLS_TO_RETURN]
 
 
 def get_zip_plans(zips: pd.DataFrame, ref_plans: pd.DataFrame):
