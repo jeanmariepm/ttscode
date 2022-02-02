@@ -98,26 +98,21 @@ def get_zip_plans(zips: pd.DataFrame, ref_plans: pd.DataFrame):
     return zip_plans[['zipcode', 'rate']]
 
 
+def get_plans_for_inout(slcsp, zip_plans):
+    return slcsp.merge(zip_plans, on='zipcode', how='left').rename(
+        columns={'rate_y': 'rate'})[['zipcode', 'rate']]
+
+
 if __name__ == "__main__":
     fnames = get_filenames()
     plans, zips, slcsp = (csv_to_df(fname) for fname in fnames)
 
     try:
         ref_plans = get_ref_plans(plans)
-    except KeyError as err:
-        print(err, file=sys.stderr)
-        print('Invalid plan file. Must be a csv file with state, rate_area and rate')
-        sys.exit(1)
-    # print(ref_plans)
-
-    try:
         zip_plans = get_zip_plans(zips, ref_plans)
+        slcsp_out = get_plans_for_inout(slcsp, zip_plans)
     except KeyError as err:
         print(err, file=sys.stderr)
-        print('Invalid zips file. Must be a csv file with zipcode, state, rate_area')
+        print('Invalid file. Must be a csv file with the relevant columns')
         sys.exit(1)
-    # print(zip_plans)
-
-    slcsp_out = slcsp.merge(zip_plans, on='zipcode', how='left').rename(
-        columns={'rate_y': 'rate'})[['zipcode', 'rate']]
     slcsp_out.to_csv(sys.stdout, index=False)

@@ -44,6 +44,20 @@ def load_test_zips():
     return df
 
 
+@pytest.fixture
+def load_test_slcsp():
+    '''
+    Create a slcsp df to test scenarios
+    '''
+    df = pd.DataFrame(columns=('zipcode', 'rate'))
+    df.loc[0] = [100001, None]
+    df.loc[1] = [200001, None]
+    df.loc[2] = [200002, None]
+    df.loc[3] = [200003, None]
+
+    return df
+
+
 def test_csv_to_df():
     '''
     Ensure file can be read into a pandas df
@@ -106,3 +120,12 @@ def test_get_zip_plans_for_ambiguous_zips(
     KY_2_FILTER = zip_plans['zipcode'] == 200002
     result = zip_plans.loc[KY_2_FILTER]
     assert len(result) == 0
+
+
+def test_get_plans_for_input(
+        load_test_zips, load_test_plans, load_test_slcsp):
+    ref_plans = slcsp.get_ref_plans(load_test_plans)
+    zip_plans = slcsp.get_zip_plans(load_test_zips, ref_plans)
+    result = slcsp.get_plans_for_inout(load_test_slcsp, zip_plans)
+    assert len(result) == 4
+    assert result['rate'].isnull().sum() == 2
